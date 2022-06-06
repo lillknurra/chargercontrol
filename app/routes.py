@@ -43,6 +43,8 @@ def index():
 		sleep(1)
 		sock.sendto(limitb, (ip, port))
 		sleep(1)
+		print('UDP sent to charger: ' + limit)
+		flash('UDP sent to charger: '+ limit)
 		if show_display:
 			start_hour = str(start_hour)
 			if start_minute == 0:
@@ -52,8 +54,11 @@ def index():
 			display = 'display 0 0 0 0 ' + 'Charging$starts$' + start_hour + ':' + start_minute
 			displayb = display.encode(encoding='utf-8')
 			sock.sendto(displayb, (ip, port))
-		print('UDP sent to charger: ' + limit + '\nCharging set to start ' + start_hour + ':' + start_minute)
-		#tkmb.showinfo("UDP command", "UDP sent to charger: \n" + limit)
-		flash('UDP sent to charger: '+ limit)
-		flash('Charging set to start ' + start_hour + ':' + start_minute)
+			flash('Charging set to start ' + start_hour + ':' + start_minute)
+		else:
+			flash('Charge command to take effect immediately!')
 	return render_template('index.html', title='Home', form=form)
+
+@app.route('/about')
+def about():
+	return render_template('about.html', title='About')
