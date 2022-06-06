@@ -1,6 +1,6 @@
 import os
 from time import sleep
-from turtle import delay
+#from turtle import delay
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from app import app
 from app.forms import PowerForm
