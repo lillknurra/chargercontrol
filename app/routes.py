@@ -26,13 +26,15 @@ def index():
 		current_second = int(now.strftime('%S'))
 		start_hour = int(form.chrghour.data)
 		start_minute = int(form.chrgminute.data)
+		show_display = True
 		if start_hour == 100 or form.currlimit.data == 'currtime 0':
-			limit = form.currlimit.data + ' 1'	
+			limit = form.currlimit.data + ' 1'
+			show_display = False
 		elif start_hour > current_hour:
 			wait_seconds = (start_hour - current_hour) * 3600 + (start_minute - current_minute) * 60
 			limit = form.currlimit.data + ' ' + str(wait_seconds)
 		else:
-			wait_seconds = (24 + start_hour - current_hour) * 3600 + (start_minute - current_minute) * 60
+			wait_seconds = (23 + start_hour - current_hour) * 3600 + (start_minute - current_minute) * 60
 			limit = form.currlimit.data + ' ' + str(wait_seconds)
 		limitb = limit.encode(encoding='utf-8')
 		refreshb = ('currtime 0 1').encode(encoding='utf-8')
@@ -40,7 +42,18 @@ def index():
 		sock.sendto(refreshb, (ip, port))
 		sleep(1)
 		sock.sendto(limitb, (ip, port))
-		print("UDP sent to charger: " + limit)
+		sleep(1)
+		if show_display:
+			start_hour = str(start_hour)
+			if start_minute == 0:
+				start_minute = '00'
+			else:
+				start_minute = str(start_minute)
+			display = 'display 0 0 0 0 ' + 'Charging$starts$' + start_hour + ':' + start_minute
+			displayb = display.encode(encoding='utf-8')
+			sock.sendto(displayb, (ip, port))
+		print('UDP sent to charger: ' + limit + '\nCharging set to start ' + start_hour + ':' + start_minute)
 		#tkmb.showinfo("UDP command", "UDP sent to charger: \n" + limit)
 		flash('UDP sent to charger: '+ limit)
+		flash('Charging set to start ' + start_hour + ':' + start_minute)
 	return render_template('index.html', title='Home', form=form)
