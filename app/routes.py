@@ -3,7 +3,7 @@ from time import sleep
 #from turtle import delay
 from flask import render_template, flash, redirect, url_for, request, send_from_directory
 from app import app
-from app.forms import PowerForm
+from app.forms import PowerForm, PermForm, SettingsForm
 from werkzeug.urls import url_parse
 import sys, socket
 from datetime import datetime
@@ -17,13 +17,12 @@ def favicon():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
 	form = PowerForm()
-	ip = "192.168.99.143"
-	port = 7090
+	ip = app.config['HOST']
+	port = int(app.config['PORT'])
 	if form.validate_on_submit():
 		now = datetime.now()
 		current_hour = int(now.strftime('%H'))
 		current_minute = int(now.strftime('%M'))
-		current_second = int(now.strftime('%S'))
 		start_hour = int(form.chrghour.data)
 		start_minute = int(form.chrgminute.data)
 		show_display = True
@@ -44,9 +43,14 @@ def index():
 		sock.sendto(limitb, (ip, port))
 		sleep(1)
 		print('UDP sent to charger: ' + limit)
+		print('IP: ' + ip)
+		print('Port: ' + str(port))
 		flash('UDP sent to charger: '+ limit)
 		if show_display:
-			start_hour = str(start_hour)
+			if start_hour < 10:
+				start_hour = '0' + str(start_hour)
+			else:
+				start_hour = str(start_hour)
 			if start_minute == 0:
 				start_minute = '00'
 			else:
@@ -58,6 +62,34 @@ def index():
 		else:
 			flash('Charge command to take effect immediately!')
 	return render_template('index.html', title='Home', form=form)
+
+@app.route('/permanent', methods=['GET', 'POST'])
+def permanent():
+	form = PermForm()
+	ip = app.config['HOST']
+	port = int(app.config['PORT'])
+	if form.validate_on_submit():
+		limit = form.currlimit.data
+		limitb = limit.encode(encoding='utf-8')
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		sock.sendto(limitb, (ip, port))
+		print('UDP sent to charger: ' + limit)
+		print('IP: ' + ip)
+		print('Port: ' + str(port))
+		flash('UDP sent to charger: '+ limit)
+		flash('Current limit command to take effect immediately!')
+	return render_template('permanent.html', title='Permanent Limit', form=form)
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+	form = SettingsForm()
+	if form.validate_on_submit():
+		ip = form.host.data
+		app.config['HOST'] = ip
+		print('Port set to: ' + ip)
+		flash('Wallbox IP address updated to: ' + ip)
+	return render_template('settings.html', title='Settings', form=form)
+
 
 @app.route('/about')
 def about():

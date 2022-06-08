@@ -23,11 +23,13 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
+                    <li><a href="{{ url_for('permanent') }}">Set Permanent Limit</a></li>
                     <li><a href="http://192.168.99.143/" target="_blank">Keba Wallbox</a></li>
                     <li><a href="https://sma3006926728/#/smartView" target="_blank">SMA Solar</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{{ url_for('about') }}">About</a></li>
+                    <li><a href="{{ url_for('settings') }}">Settings</a></li>
                 </ul>
             </div>
         </div>
