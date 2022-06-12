@@ -9,15 +9,14 @@ from datetime import datetime
 
 def thread_sock(wait, command, address):
 	print('running thread ' + str(command))
-	time.sleep(wait)
-	print('wait time over!')
 	print('Sleep: ' + str(wait))
 	print('IP: ' + address[0])
 	print('Port: ' + str(address[1]))
-	print('UDP sent to charger: ' + str(command))
+	time.sleep(wait)
+	print('wait time over!')
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.sendto(command, (address))
-	print('Done!')
+	print('UDP sent to charger: ' + str(command))
 
 @app.route('/favicon.ico')
 def favicon():
@@ -83,8 +82,8 @@ def index():
 				if stop_wait > 0:
 					stop = 'currtime 0 1'
 					stopb = stop.encode(encoding='utf-8')
-					thread = threading.Thread(target=thread_sock, args=(stop_wait, stopb, (ip, port)))
-					thread.start()
+					threadstop = threading.Thread(target=thread_sock, args=(stop_wait, stopb, (ip, port)), daemon=True)
+					threadstop.start()
 					if stop_hour < 10:
 						stop_hour = '0' + str(stop_hour)
 					else:
