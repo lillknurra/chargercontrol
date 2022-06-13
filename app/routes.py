@@ -84,6 +84,7 @@ def index():
 					stopb = stop.encode(encoding='utf-8')
 					threadstop = threading.Thread(target=thread_sock, args=(stop_wait, stopb, (ip, port)), daemon=True)
 					threadstop.start()
+					flash('Seconds until charge stop: '+ str(stop_wait))
 					if stop_hour < 10:
 						stop_hour = '0' + str(stop_hour)
 					else:
